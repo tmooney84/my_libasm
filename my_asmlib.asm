@@ -5,9 +5,9 @@
 ; strchr      -> my_strchr	;
 ; memset      -> my_memset
 ; memcpy      -> my_memcpy
-; strcmp      -> my_strcmp	
+; strcmp      -> my_strcmp	;
 ; memmove     -> my_memmove
-; strncmp     -> my_strncmp
+; strncmp     -> my_strncmp	;
 ; strcasecmp  -> my_strcasecmp
 ; index       -> my_index
 ; read        -> my_read	;
@@ -75,48 +75,149 @@ jmp .end
 
 ;===================================================
 ; my_strcmp proc
-; int strcmp(const char *s1, const char *s2);
-
 global my_strcmp
-section .data
+section .text
 
+; int strcmp(const char *s1, const char *s2)
 ; rdi = s1
 ; rsi = s2
 
-section .text
-
 my_strcmp:
-	xor rax, rax
+    xor rax, rax            ; rax = 0 (will hold return value)
 
 .loop:
-	mov al, [rdi]
-	mov dl, [rsi]
-	cmp al, dl
-	jne .diff
-	
-	test al, al
-	je .equal
+    mov al, [rdi]           ; load s1[i]
+    mov dl, [rsi]           ; load s2[i]
 
-	inc rsi
-	inc rdi
-	jmp .loop
+    cmp al, dl              ; compare the bytes
+    jl .less
+    jg .greater
 
-.diff
-	mov eax, 1
-	jb .less
-	jmp .end
+    test al, al             ; check for null terminator
+    je .equal               ; if zero, both matched until end
 
-.less
-	mov eax, -1
-	jmp .end
+    inc rdi
+    inc rsi
+    jmp .loop
 
-.equal
-	xor eax, eax
+.less:
+    mov eax, -1
+    jmp .end
 
-.end
-	ret
+.greater:
+    mov eax, 1
+    jmp .end
 
+.equal:
+    xor eax, eax
 
+.end:
+    ret
+
+;===================================================
+; my_strncmp proc
+global my_strncmp
+section .text
+
+; int strcmp(const char *s1, const char *s2, size_t num)
+; rdi = s1
+; rsi = s2
+; rdx = num
+
+my_strncmp:
+    mov r8, rdx
+    xor rax, rax            ; rax = 0 (will hold return value)
+    xor rcx, rcx	    ; rcx = 0 (holds counter)	
+.loop:
+    cmp r8, rcx
+    je .equal
+    
+    mov al, [rdi]           ; load s1[i]
+    mov dl, [rsi]           ; load s2[i]
+
+    cmp al, dl              ; compare the bytes
+    jl .less
+    jg .greater
+
+    test al, al             ; check for null terminator
+    je .equal               ; if zero, both matched until end
+
+    inc rdi
+    inc rsi
+    inc rcx
+    jmp .loop
+
+.less:
+    mov eax, -1
+    jmp .end
+
+.greater:
+    mov eax, 1
+    jmp .end
+
+.equal:
+    xor eax, eax
+
+.end:
+    ret
+
+;===================================================
+; my_strcasecmp proc
+global my_strcasecmp
+section .text
+
+; int strcasecmp(const char *s1, const char *s2);
+; rdi = s1
+; rsi = s2
+
+my_strcasecmp:
+    xor rax, rax            ; rax = 0 (will hold return value)
+
+.loop:
+    mov al, [rdi]           ; load s1[i]
+    mov dl, [rsi]           ; load s2[i]
+
+   ; --- convert AL to lowercase if A-Z ---
+    cmp al, 'A'
+    jb .skip_lower_al
+    cmp al, 'Z'
+    ja .skip_lower_al
+    or al, 0x20		; sets lowercase bit
+
+.skip_lower_al:
+    ; --- convert DL to lowercase if A-Z ---
+    cmp dl, 'A'
+    jb .skip_lower_dl
+    cmp dl, 'Z'
+    ja .skip_lower_dl
+    or dl, 0x20		; sets lowercase bit
+
+.skip_lower_dl:
+
+    cmp al, dl
+    jl .less
+    jg .greater
+
+    test al, al             ; check for null terminator
+    je .equal               ; if zero, both matched until end
+
+    inc rdi
+    inc rsi
+    jmp .loop
+
+.less:
+    mov eax, -1
+    jmp .end
+
+.greater:
+    mov eax, 1
+    jmp .end
+
+.equal:
+    xor eax, eax
+
+.end:
+    ret
 
 
 
