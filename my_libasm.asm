@@ -13,15 +13,22 @@
 ; read        -> my_read	;
 ; write       -> my_write	;
 
-;===================================================
-; my_strlen proc
-
 global my_strlen
-section .data
-
-;test_string: db "abcdef", 0
+global my_strchr
+global my_index
+global my_memset
+global my_memcpy
+global my_memmove
+global my_strcmp
+global my_strncmp
+global my_strcasecmp
+global my_read
+global my_write
 
 section .text
+
+;===================================================
+; my_strlen proc
 
 my_strlen:
 	xor rax, rax 			; set counter to zero
@@ -39,14 +46,6 @@ my_strlen:
 ;===================================================
 ; my_strchar proc
 ; char *strchar(const char *str, int ch);
-
-global my_strchr
-section .data
-
-;test_string: db "abcdef", 0
-;test_char: db "c"
-
-section .text
 
 ; rdi = str
 ; rsi = ch
@@ -81,8 +80,6 @@ jmp .end
 ; rsi = src
 ; rdx = count
 
-global my_memset
-
 ;DESCRIPTION
 ;The memmove() function copies n bytes from memory area src to
 ;memory area dest.  The memory areas may overlap: copying takes
@@ -91,8 +88,6 @@ global my_memset
 ;copied from the temporary array to dest.
 
 ; my_memset proc
-global my_memset
-section .text
 
 ; void * my_memset (void * ptr, int value, size_t num);
 ; rdi = ptr
@@ -117,9 +112,6 @@ my_memset:
 
 ;===================================================
 ; my_memmove proc
-
-global my_memmove
-section .text
 
 ;void* my_memmove( void* dest, const void* src, size_t count);
 ; rdi = dest
@@ -173,8 +165,6 @@ my_memmove:
 
 ;===================================================
 ; my_memcpy proc
-global my_memcpy
-section .text
 
 ; void *my_memcpy(void *dest_str, const void * src_str, size_t n);
 ; rdi = dest_str
@@ -199,8 +189,6 @@ my_memcpy:
 
 ;===================================================
 ; my_strcmp proc
-global my_strcmp
-section .text
 
 ; int strcmp(const char *s1, const char *s2)
 ; rdi = s1
@@ -240,8 +228,6 @@ my_strcmp:
 
 ;===================================================
 ; my_strncmp proc
-global my_strncmp
-section .text
 
 ; int strcmp(const char *s1, const char *s2, size_t num)
 ; rdi = s1
@@ -287,8 +273,6 @@ my_strncmp:
 
 ;===================================================
 ; my_strcasecmp proc
-global my_strcasecmp
-section .text
 
 ; int strcasecmp(const char *s1, const char *s2);
 ; rdi = s1
@@ -349,9 +333,6 @@ my_strcasecmp:
 ; [!DEPRICATED POSIX FUNCTION index() as a macro that 
 ; expands to a call to strchr().]
 
-global my_index
-section .text
-
 my_index: 
 	call my_strchr
 
@@ -359,10 +340,7 @@ my_index:
 
 ;===================================================
 ; my_read proc
-
 ; TODO? -1 for errors?
-global my_read
-section .text
 
 my_read: 
 	; On function entry
@@ -379,9 +357,6 @@ my_read:
 ; my_write proc
 ; TODO? -1 for errors?
 
-global my_write
-section .text
-
 my_write: 
 	; On function entry
 	; rdi = fd
@@ -394,7 +369,6 @@ my_write:
 	; After syscall
 	; rax = return value (bytes written or -errno)
 	ret			; return to C caller
-
 
 ; Explicitly mark non-executable stack
 section .note.GNU-stack noexec
