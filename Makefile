@@ -1,32 +1,42 @@
-# === Makefile for x86-64 Assembly Library ===
-
-ASM     = nasm
+# ===== SETTINGS =====
 CC      = gcc
-ASMFLAGS = -f elf64 -g -F dwarf
-CFLAGS  = -Wall -Wextra -g
-TARGET  = executor
+ASM     = nasm
+#CFLAGS  = -Wall -Wextra -Werror
+#CFLAGS  = -Wall -Wextra -Werror -g -no-pie
+CFLAGS  = -Wall -Wextra -g -no-pie
 
-# Assembly and C source files
+#CFLAGS  = -Wall -Wextra 
+
+ASMFLAGS = -f elf64 -g -F dwarf
+
+#ASMFLAGS = -f elf64
+LDFLAGS = -lcriterion
+
+# ===== FILES =====
 ASM_SRC = my_libasm.asm
 ASM_OBJ = $(ASM_SRC:.asm=.o)
-C_SRC   = test_my_libasm.c
-C_OBJ   = $(C_SRC:.c=.o)
 
-# Default target
+TEST_SRC = libasm_test.c
+TEST_OBJ = $(TEST_SRC:.c=.o)
+
+TARGET = tests
+
+# ===== RULES =====
 all: $(TARGET)
 
-# Link everything
-$(TARGET): $(ASM_OBJ) $(C_OBJ)
-	$(CC) $(CFLAGS) -o $@ $^
-
-# Assemble assembly code
 $(ASM_OBJ): $(ASM_SRC)
 	$(ASM) $(ASMFLAGS) -o $@ $<
 
-# Compile C test file
-$(C_OBJ): $(C_SRC)
+$(TEST_OBJ): $(TEST_SRC)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-# Clean up
+$(TARGET): $(ASM_OBJ) $(TEST_OBJ)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
 clean:
-	rm -f $(ASM_OBJ) $(C_OBJ) $(TARGET)
+	rm -f $(ASM_OBJ) $(TEST_OBJ)
+
+fclean: clean
+	rm -f $(TARGET)
+
+re: fclean all
