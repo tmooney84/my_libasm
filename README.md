@@ -2,18 +2,23 @@
 ***
 
 ## Task
-TODO - What is the problem? And where is the challenge?
+Create a library of x86-64 assembly functions that are similar to several functions found in the standard C library.
 
 ## Description
-TODO - How have you solved the problem?
+The x86-64 assembly instructions use system calls and x86-64 instructions.
+
 
 ## Installation
-TODO - How to install your project? npm install? make? make re?
+To compile the code into an executable file:
+
+```
+make
+```
 
 ## Usage
-TODO - How does it work?
+To run the executable with a local test
 ```
-./my_project argument1 argument2
+./executor
 ```
 
 ### The Core Team
