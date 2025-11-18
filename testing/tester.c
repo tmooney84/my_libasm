@@ -1,21 +1,21 @@
-# include <stdio.h>
-# include <stdlib.h>
-# include <sys/types.h>
-# include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <string.h>
+#include <strings.h>
 
-ssize_t my_read(int fd, const char *buf, size_t count);
-ssize_t my_write(int fd, const char *buf, size_t count);
-size_t my_strlen(const char *s);
-char *my_strchr(const char *s, int c);
-char *my_index(const char *s, int c);
-int my_strcmp(const char *s1, const char *s2);
-int my_strncmp(const char *s1, const char *s2, size_t num);
-int my_strcasecmp(const char *s1, const char *s2);
+extern ssize_t my_read(int fd, char *buf, size_t count);
+extern ssize_t my_write(int fd, const char *buf, size_t count);
+extern size_t my_strlen(const char *s) asm("my_strlen");
+extern char *my_strchr(const char *s, int c);
+extern char *my_index(const char *s, int c);
+extern int my_strcmp(const char *s1, const char *s2);
+extern int my_strncmp(const char *s1, const char *s2, size_t num);
+extern int my_strcasecmp(const char *s1, const char *s2);
 
-
-void *my_memcpy(void *dest_str, const void * src_str, size_t n);
-void * my_memset ( void * ptr, int value, size_t num );
-void* my_memmove( void* dest, const void* src, size_t count);
+extern void *my_memcpy(void *dest_str, const void *src_str, size_t n);
+extern void *my_memset(void *ptr, int value, size_t num);
+extern void *my_memmove(void *dest, const void *src, size_t count);
 
 /*
        DESCRIPTION
@@ -26,31 +26,32 @@ void* my_memmove( void* dest, const void* src, size_t count);
        copied from the temporary array to dest.
 */
 
-int main(void){
-	//my_read
-	char *buf = malloc(50 * sizeof(char));
-	my_read(0, buf, 49);
-	my_write(1, buf, 49);
-	printf("\n");
+int main(void)
+{
+    // my_read
+    char *buf = malloc(50 * sizeof(char));
+    my_read(0, buf, 49);
+    my_write(1, buf, 49);
+    printf("\n");
 
-	// my_write
-	const char msg[] = "Hello from TV land!";
-	my_write(1, msg, sizeof(msg) - 1);
-	printf("\n");
+    // my_write
+    const char msg[] = "Hello from TV land!";
+    my_write(1, msg, sizeof(msg) - 1);
+    printf("\n");
 
-    //my_strlen
+    // my_strlen
     int my_len = my_strlen(msg);
     int len = strlen(msg);
-    printf ("my string length is %d\n", my_len);
-    printf ("string length is %d\n", len);
+    printf("my string length is %d\n", my_len);
+    printf("string length is %d\n", len);
 
-    //my_strchr
+    // my_strchr
     printf("before: %s\n", msg);
     char letter = 'f';
     char *aft = my_strchr(msg, letter);
     printf("after: %s\n", aft);
 
-    //my_strcmp
+    // my_strcmp
     const char s1[] = "test";
     const char s2[] = "test";
     printf("Result A: %d\n", my_strcmp(s1, s2));
@@ -69,32 +70,32 @@ int main(void){
     printf("%d\n", my_strcmp("apple", "apple"));  // 0
     printf("%d\n", my_strcmp("apple", "apples")); // -1
     printf("%d\n", my_strcmp("banana", "apple")); // 1
-   
-    //my_strncmp
+
+    // my_strncmp
     printf("////////////////////////////\n");
-    
-    printf("%d\n", my_strncmp("appledddfdf", "apple", 4)); // 0
-    printf("%d\n", my_strncmp("appledddddddddddd", "applesssssssssssss", 10)); // 0
+
+    printf("%d\n", my_strncmp("appledddfdf", "apple", 4));                            // 0
+    printf("%d\n", my_strncmp("appledddddddddddd", "applesssssssssssss", 10));        // 0
     printf("%d\n", my_strncmp("applezzzzzzzzzzzzzzzzzzz", "applesssssssssssss", 10)); // 0
 
     printf("////////////////////////////\n");
-    
-    //my_strcasecmp
+
+    // my_strcasecmp
     printf("Apple vs. apple test: %d\n", my_strcasecmp("Apple", "apple")); // 0
 
-    //my_index
-	const char msg1[] = "Hello from TV land!";
+    // my_index
+    const char msg1[] = "Hello from TV land!";
     printf("before: %s\n", msg1);
     char letter1 = 'f';
     char *aft1 = my_index(msg1, letter1);
     printf("after: %s\n", aft1);
 
     printf("////////////////////////////\n");
-    //my_memset
+    // my_memset
     printf("my_memset: \n");
     char *testing = malloc(100 * sizeof(char));
     strcpy(testing, "Hello from TV land!");
-	char msg2[] = "Hello from TV land!";
+    char msg2[] = "Hello from TV land!";
     char *res2 = my_memset(msg2, 'x', 7);
     printf("after: %s\n", res2);
     printf("after: %s\n", msg2);
@@ -105,7 +106,7 @@ int main(void){
     printf("after: %s\n", testing);
 
     printf("////////////////////////////\n");
-    //my_memcpy
+    // my_memcpy
     printf("my_memcopy:\n");
     char *dst1 = malloc(100 * sizeof(char));
     strcpy(dst1, "Hello from TV land!");
@@ -118,9 +119,31 @@ int main(void){
     printf("after dst1: %s\n", dst1);
 
     printf("////////////////////////////\n");
-    //my_memmove
+    // my_memmove
     char bufz[10] = "abcdef";
     my_memmove(bufz + 2, bufz, 5);
     printf("%s\n", bufz);
+
+    // printf("______________________________________\n");
+    // printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+    // printf("______________________________________\n");
+
+    // const char t1[] = "The quick brown fox jumps";
+    // const char t2[] = "The quick brown dog";
+
+    // printf("strncmp result = %d\n", strncmp(t1, t2, 19));
+    // printf("my_strncmp result = %d\n", my_strncmp(t1, t2, 19));
+
+    // printf("\n");
+    // printf("\n");
+
+    // const char t3[] = "THE QUICK BROWN FOX JUMPS";
+    // const char t4[] = "The quick brown dog";
+    // printf("strcasecmp result = %d\n", strcasecmp(t3, t4));
+    // printf("my_strcasecmp result = %d\n", my_strcasecmp(t3, t4));
+
     return 0;
+    // Test(output, my_strcasecmp_test_02, .init = redirect_all_std) {
+    //   cr_assert(eq(i32, strcasecmp("THE QUICK BROWN FOX JUMPS", "The quick brown dog"), my_strcasecmp("THE QUICK BROWN FOX JUMPS", "The quick brown dog")));
+    // }
 }
